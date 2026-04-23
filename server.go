@@ -100,7 +100,7 @@ func (s *Server) tcpOpen() error {
 				_ = s.listener.SetDeadline(time.Now().Add(s.ReadTimeout))
 				conn, connErr := s.listener.Accept()
 				if connErr != nil && s.Handle.ErrorVerifyHandle(connErr) {
-					s.close(readErr)
+					s.close(connErr)
 				}
 				if connErr == nil {
 					s.tcpClientHandle(conn)
