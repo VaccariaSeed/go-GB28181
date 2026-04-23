@@ -99,10 +99,10 @@ func (s *Server) tcpOpen() error {
 			default:
 				_ = s.listener.SetDeadline(time.Now().Add(s.ReadTimeout))
 				conn, connErr := s.listener.Accept()
-				if err != nil && s.Handle.ErrorVerifyHandle(connErr) {
-					s.close(err)
+				if connErr != nil && s.Handle.ErrorVerifyHandle(connErr) {
+					s.close(readErr)
 				}
-				if err == nil {
+				if connErr == nil {
 					s.tcpClientHandle(conn)
 				}
 			}
@@ -130,8 +130,8 @@ func (s *Server) udpOpen() error {
 			default:
 				_ = s.udpConn.SetReadDeadline(time.Now().Add(s.ReadTimeout))
 				n, clientAddr, readErr := s.udpConn.ReadFromUDP(buffer)
-				if err != nil && s.Handle.ErrorVerifyHandle(readErr) {
-					s.close(err)
+				if readErr != nil && s.Handle.ErrorVerifyHandle(readErr) {
+					s.close(readErr)
 				}
 				if readErr == nil {
 					camera := s.clis.flushUdpCamera(clientAddr, s.Config, s.udpConn)
