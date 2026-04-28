@@ -40,6 +40,10 @@ func (s *Server) close(err error) {
 // Close 关闭服务端
 func (s *Server) Close() error {
 	var err error
+	if s.cancel != nil {
+		s.cancel()
+		s.cancel, s.ctx = nil, nil
+	}
 	if s.listener != nil {
 		err = s.listener.Close()
 		s.listener = nil
@@ -48,10 +52,7 @@ func (s *Server) Close() error {
 		err = s.udpConn.Close()
 		s.udpConn, s.udpAddr = nil, nil
 	}
-	if s.cancel != nil {
-		s.cancel()
-		s.cancel, s.ctx = nil, nil
-	}
+	
 	s.clis.clear()
 	return err
 }
