@@ -130,6 +130,9 @@ func (s *Server) udpOpen() error {
 			case <-s.ctx.Done():
 				return
 			default:
+				if s.udpConn == nil {
+					return
+				}
 				_ = s.udpConn.SetReadDeadline(time.Now().Add(s.ReadTimeout))
 				n, clientAddr, readErr := s.udpConn.ReadFromUDP(buffer)
 				if readErr != nil && s.Handle.ErrorVerifyHandle(readErr) {
