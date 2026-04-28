@@ -42,7 +42,6 @@ func (s *Server) Close() error {
 	var err error
 	if s.cancel != nil {
 		s.cancel()
-		s.cancel, s.ctx = nil, nil
 	}
 	if s.listener != nil {
 		err = s.listener.Close()
@@ -52,7 +51,6 @@ func (s *Server) Close() error {
 		err = s.udpConn.Close()
 		s.udpConn, s.udpAddr = nil, nil
 	}
-	
 	s.clis.clear()
 	return err
 }
@@ -98,6 +96,9 @@ func (s *Server) tcpOpen() error {
 			case <-s.ctx.Done():
 				return
 			default:
+				if s.listener == nil {
+					return
+				}
 				_ = s.listener.SetDeadline(time.Now().Add(s.ReadTimeout))
 				conn, connErr := s.listener.Accept()
 				if connErr != nil && s.Handle.ErrorVerifyHandle(connErr) {
